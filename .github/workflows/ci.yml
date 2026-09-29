@@ -1,0 +1,36 @@
+name: DevOps Final CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Application
+        run: |
+          test -f index.html
+          test -f Dockerfile
+          test -f default.conf
+          echo "Application validation successful"
+
+      - name: Build Docker Image
+        run: docker build -t devops-final-app:${{ github.sha }} .
+
+      - name: Store Build Information
+        run: |
+          echo "Build completed successfully" > build-info.txt
+          echo "Commit: ${{ github.sha }}" >> build-info.txt
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: devops-final-build-info
+          path: build-info.txt
